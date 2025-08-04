@@ -1,0 +1,31 @@
+[build-system]
+# 构建项目所需的依赖包及其版本约束
+requires = [
+    "setuptools>=58.0",          # 最低要求的setuptools版本，避免旧版本兼容问题
+    "wheel",                     # 用于生成wheel分发格式
+    "torch>=1.10.0",             # PyTorch基础依赖，匹配你的CUDA扩展需求
+    "torchvision",               # 可选，如果你使用了PyTorch的视觉相关功能
+    "ninja",                     # 加速CUDA扩展编译的工具，尤其对大型项目有明显提速
+    "CUDA-python>=11.7"          # 可选，如果你直接使用了CUDA Python API
+]
+
+# 指定构建后端，使用setuptools的构建元数据
+build-backend = "setuptools.build_meta"
+
+# 可选：项目元数据（如果不想在setup.py中重复定义）
+[project]
+name = "my_cuda_add"
+version = "0.1.0"
+authors = [
+    { name = "Li Shi", email = "cs_jeff_zhu@163.com" }
+]
+description = "A CUDA-accelerated addition operation extension for PyTorch"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "Programming Language :: CUDA",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+]
+    
