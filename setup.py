@@ -42,7 +42,8 @@ setup(
         CUDAExtension(
             name='my_cuda_add',
             sources=source_files,  # 使用批量获取的文件列表
-            include_dirs=[os.path.abspath('src')]  # 头文件目录（根据实际情况修改）
+            include_dirs=[os.path.abspath('src')],  # 头文件目录（根据实际情况修改）
+            extra_link_args=["-lOpenCL"]
         ),
     ],
     cmdclass={'build_ext': BuildExtension}
