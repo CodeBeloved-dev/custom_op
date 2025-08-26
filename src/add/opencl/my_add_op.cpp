@@ -24,11 +24,40 @@ std::string getCurrentFileDir() {
     }
     return path.substr(0, lastSlash);
 }
+
+cl_device_id get_first_available_device() {
+    cl_uint num_platforms = 0;
+    clGetPlatformIDs(0, nullptr, &num_platforms);
+    if (num_platforms == 0) {
+        std::cerr << "No OpenCL platforms found!\n";
+        return nullptr;
+    }
+
+    std::vector<cl_platform_id> platforms(num_platforms);
+    clGetPlatformIDs(num_platforms, platforms.data(), nullptr);
+
+    for (auto platform : platforms) {
+        cl_uint num_devices = 0;
+        // 尝试获取 GPU 或 DEFAULT 类型设备
+        cl_int err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, nullptr, &num_devices);
+        if (err != CL_SUCCESS || num_devices == 0) continue;
+
+        std::vector<cl_device_id> devices(num_devices);
+        clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, devices.data(), nullptr);
+
+        // 返回第一个可用设备
+        return devices[0];
+    }
+
+    std::cerr << "No OpenCL devices found on any platform!\n";
+    return nullptr;
+}
+
 torch::Tensor add_opencl(torch::Tensor a, torch::Tensor b) {
     TORCH_CHECK(a.sizes() == b.sizes(), "Input tensors must have the same shape.");
     TORCH_CHECK(a.device().is_cpu(), "Only CPU tensors are supported.");
     TORCH_CHECK(a.dtype() == torch::kFloat32, "Only float32 supported.");
-
+    printf("aaaaa\n");
     int64_t n = a.numel();
     auto out = torch::empty_like(a);
 
@@ -44,7 +73,8 @@ torch::Tensor add_opencl(torch::Tensor a, torch::Tensor b) {
     cl_command_queue queue = nullptr;
 
     err = clGetPlatformIDs(1, &platform_id, nullptr); CHECK_CL(err);
-    err = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, nullptr); CHECK_CL(err);
+    device_id = get_first_available_device();
+    err = !device_id; CHECK_CL(err);
     context = clCreateContext(nullptr, 1, &device_id, nullptr, nullptr, &err); CHECK_CL(err);
     queue = clCreateCommandQueue(context, device_id, 0, &err); CHECK_CL(err);
 
