@@ -14,11 +14,12 @@ def test_cuda_add_basic():
     assert torch.allclose(result, torch.tensor([5.0, 7.0, 9.0], device='cpu'))
 
 def test_cuda_add_large_tensors():
-    """测试大型张量加法"""
-    a = torch.randn(80000, 10000, device='cuda')
-    b = torch.randn(80000, 10000, device='cuda')
-    result = my_cuda_add.add_cuda(a, b)
-    assert torch.allclose(result, a + b)  # 与PyTorch内置加法对比
+    if torch.cuda.is_available():
+        """测试大型张量加法"""
+        a = torch.randn(80000, 10000, device='cuda')
+        b = torch.randn(80000, 10000, device='cuda')
+        result = my_cuda_add.add_cuda(a, b)
+        assert torch.allclose(result, a + b)  # 与PyTorch内置加法对比
     
     
 if __name__ == "__main__":
