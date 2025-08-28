@@ -26,6 +26,7 @@ def find_source_files(root_dir, with_cuda):
     
     return source_files
 
+WITH_CUDA=False
 if torch.cuda.is_available():
     WITH_CUDA=True
 
